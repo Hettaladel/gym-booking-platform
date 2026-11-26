@@ -2,6 +2,7 @@
 
 **Date:** October – December 2025 · 4th-year engineering (ING 4), Agile Management Methods (MMA) module, University of Boumerdès (UMBB)
 **Team:** Adel Hettal, Abderrahmane Ferhat, Meriem Boukhedimi, Asma Hamiche
+**Project summary (PDF):** [docs/project-summary.pdf](docs/project-summary.pdf)
 
 A web application for running a gym's class schedule: members book classes, coaches run their sessions, and an administrator manages accounts and the timetable. The team built it in Scrum sprints for the MMA module. It is split into three Django services that talk to each other over HTTP and a message queue. The interface is in French.
 
