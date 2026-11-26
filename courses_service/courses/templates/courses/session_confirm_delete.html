@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Session - WAMS Gym{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+    <h1 style="color: #ff4444;">Delete Session?</h1>
+    <p>Are you sure you want to cancel the <strong>{{ session.course.title }}</strong> session on {{
+        session.start_datetime|date:"D, M d \a\t H:i" }}?</p>
+
+    <div
+        style="background: rgba(255, 68, 68, 0.1); padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #ff4444;">
+        <strong>Warning:</strong> This action cannot be undone. All reservations will be lost.
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-top: 20px; display: flex; center; gap: 10px; justify-content: center;">
+            <button type="submit" class="btn" style="background-color: #ff4444;">Yes, Delete Session</button>
+            <a href="{% url 'session_details' session.id %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Session Overview</h1>
+    <p>All coaching sessions scheduled in the system.</p>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid #444;">
+                <th style="padding: 10px;">ID</th>
+                <th style="padding: 10px;">Course</th>
+                <th style="padding: 10px;">Coach</th>
+                <th style="padding: 10px;">Start Time</th>
+                <th style="padding: 10px;">End Time</th>
+                <th style="padding: 10px;">Capacity</th>
+                <th style="padding: 10px;">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in sessions %}
+            <tr style="border-bottom: 1px solid #333;">
+                <td style="padding: 10px;">{{ item.session.id }}</td>
+                <td style="padding: 10px;">{{ item.session.course.title }}</td>
+                <td style="padding: 10px;">
+                    <div>{{ item.coach_name }}</div>
+                    <div style="font-size: 0.8em; color: #888;">{{ item.coach_email }}</div>
+                </td>
+                <td style="padding: 10px;">{{ item.session.start_datetime|date:"d M Y H:i" }}</td>
+                <td style="padding: 10px;">{{ item.session.end_datetime|date:"H:i" }}</td>
+                <td style="padding: 10px;">{{ item.session.capacity }}</td>
+                <td style="padding: 10px;">
+                    <a href="{% url 'session_details' item.session.id %}" class="btn"
+                        style="padding: 4px 10px; font-size: 0.8rem;">View Reservations</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if not sessions %}
+    <p style="margin-top: 20px; color: #888; text-align: center;">No sessions found.</p>
+    {% endif %}
+</div>
+{% endblock %}

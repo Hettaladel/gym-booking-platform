@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.consulcatalog=true"
+      - "--providers.consulcatalog.endpoint.address=consul:8500"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80" # API endpoints
+      - "8080:8080" # Dashboard
+    # volumes removed as we use Consul
+    networks:
+      - gym-network
+
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
+    ports:
+      - "8500:8500"
+    command: agent -server -bind=0.0.0.0 -client=0.0.0.0 -bootstrap-expect=1 -ui
+    networks:
+      - gym-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - gym-network
+
+  notification-service:
+    build: ./auth_service
+    container_name: notification-service
+    command: python manage.py run_consumer
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - CONSUL_HOST=consul
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-only-insecure-key-change-me}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-True}
+    depends_on:
+      - rabbitmq
+      - auth-service
+    networks:
+      - gym-network
+
+  auth-service:
+    build: ./auth_service
+    container_name: auth-service
+    volumes:
+      - ./auth_service:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/api/auth`) || PathPrefix(`/api/token`) || PathPrefix(`/api/users`) || PathPrefix(`/auth`) || PathPrefix(`/gym-admin`)"
+      - "traefik.http.services.auth.loadbalancer.server.port=8001"
+    ports:
+      - "8001:8001"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=auth-service
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-only-insecure-key-change-me}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-True}
+      - SERVICE_PORT=8001
+      - SERVICE_ADDRESS=auth-service
+    networks:
+      - gym-network
+
+  courses-service:
+    build: ./courses_service
+    container_name: courses-service
+    volumes:
+      - ./courses_service:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.courses.rule=PathPrefix(`/api/courses`) || PathPrefix(`/api/sessions`) || PathPrefix(`/courses`) || PathPrefix(`/`)"
+      - "traefik.http.services.courses.loadbalancer.server.port=8002"
+    ports:
+      - "8002:8002"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=courses-service
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-only-insecure-key-change-me}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-True}
+      - SERVICE_PORT=8002
+      - SERVICE_ADDRESS=courses-service
+    networks:
+      - gym-network
+
+  reservations-service:
+    build: ./reservations_service
+    container_name: reservations-service
+    volumes:
+      - ./reservations_service:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.reservations.rule=PathPrefix(`/api/reservations`) || PathPrefix(`/reservations`)"
+      - "traefik.http.services.reservations.loadbalancer.server.port=8003"
+    ports:
+      - "8003:8003"
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=reservations-service
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-only-insecure-key-change-me}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-True}
+      - SERVICE_PORT=8003
+      - SERVICE_ADDRESS=reservations-service
+    networks:
+      - gym-network
+
+networks:
+  gym-network:
+    driver: bridge

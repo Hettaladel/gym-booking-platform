@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Coach Dashboard - WAMS Gym{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Coach Dashboard</h1>
+    <a href="{% url "create_session" %}" class="btn">Schedule New Session</a>
+</div>
+
+{% if sessions %}
+<div style="overflow-x: auto;">
+    <table
+        style="width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 12px; overflow: hidden;">
+        <thead>
+            <tr style="background: rgba(255, 77, 77, 0.1); color: var(--primary);">
+                <th style="padding: 1rem; text-align: left;">Course</th>
+                <th style="padding: 1rem; text-align: left;">Date</th>
+                <th style="padding: 1rem; text-align: left;">Time</th>
+                <th style="padding: 1rem; text-align: left;">Capacity</th>
+                <th style="padding: 1rem; text-align: left;">Reservations</th>
+                <th style="padding: 1rem; text-align: left;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session_data in sessions %}
+            <tr style="border-bottom: 1px solid #444; transition: background 0.2s;"
+                onmouseover="this.style.background="rgba(255, 77, 77, 0.05)""
+                onmouseout="this.style.background="transparent"">
+                <td style="padding: 1rem;"><strong>{{ session_data.session.course.title }}</strong></td>
+                <td style="padding: 1rem;">{{ session_data.session.start_datetime|date:"Y-m-d" }}</td>
+                <td style="padding: 1rem;">{{ session_data.session.start_datetime|time:"H:i" }} - {{ session_data.session.end_datetime|time:"H:i" }}</td>
+                <td style="padding: 1rem;">{{ session_data.session.capacity }}</td>
+                <td style="padding: 1rem;">
+                    <span dir="ltr" style="color: {% if session_data.reservations|length > 0 %}#4f4{% else %}#888{% endif %}; font-weight: bold;">
+                        {{ session_data.reservations|length }} / {{ session_data.session.capacity }}
+                    </span>
+                </td>
+                <td style="padding: 1rem; display: flex; gap: 10px;">
+                    <a href="{% url "session_details" session_data.session.id %}" class="btn"
+                        style="padding: 6px 12px; font-size: 0.8rem; background-color: #333; border: 1px solid #555;">View</a>
+                    <a href="{% url "session_edit" session_data.session.id %}" class="btn"
+                        style="padding: 6px 12px; font-size: 0.8rem;">Edit</a>
+                    <a href="{% url "session_delete" session_data.session.id %}" class="btn"
+                        style="padding: 6px 12px; font-size: 0.8rem; background-color: #ff4444;">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div
+        style="margin-top: 1rem; padding: 1rem; background: rgba(255, 77, 77, 0.05); border-radius: 8px; text-align: center;">
+        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+            💡 Click on any session to view detailed member information
+        </p>
+    </div>
+</div>
+{% else %}
+<div class="card" style="text-align: center;">
+    <p>You haven_t scheduled any sessions yet.</p>
+    <a href="{% url "create_session" %}" class="btn" style="margin-top: 1rem;">Create First Session</a>
+</div>
+{% endif %}
+{% endblock %}

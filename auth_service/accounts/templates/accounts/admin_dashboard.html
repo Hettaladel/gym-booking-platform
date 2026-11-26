@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, Admin. Select an area to manage.</p>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+        <a href="{% url 'admin-user-list' %}" class="card"
+            style="flex: 1; min-width: 250px; text-decoration: none; color: inherit; background: #333; transition: transform 0.2s;">
+            <h2 style="color: #FF4D4D;">User Management</h2>
+            <p style="color: #ccc;">View, edit, and delete users (Members, Coaches, Admins).</p>
+            <span class="btn">Manage Users</span>
+        </a>
+
+        <a href="http://localhost:8002/gym-admin/sessions/" class="card"
+            style="flex: 1; min-width: 250px; text-decoration: none; color: inherit; background: #333; transition: transform 0.2s;">
+            <h2 style="color: #FFD700;">Session Overview</h2>
+            <p style="color: #ccc;">View all coaching sessions and reservations.</p>
+            <span class="btn">View Sessions</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

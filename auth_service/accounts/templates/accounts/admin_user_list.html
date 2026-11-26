@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .badge-admin {
+        background-color: #FFD700;
+        color: black;
+    }
+
+    .badge-coach {
+        background-color: #FF4D4D;
+        color: white;
+    }
+
+    .badge-member {
+        background-color: #444;
+        color: white;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>User Management</h1>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid #444;">
+                <th style="padding: 10px;">ID</th>
+                <th style="padding: 10px;">Username</th>
+                <th style="padding: 10px;">Email</th>
+                <th style="padding: 10px;">Role</th>
+                <th style="padding: 10px;">Active</th>
+                <th style="padding: 10px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr style="border-bottom: 1px solid #333;">
+                <td style="padding: 10px;">{{ user.id }}</td>
+                <td style="padding: 10px;">{{ user.username }}</td>
+                <td style="padding: 10px;">{{ user.email }}</td>
+                <td style="padding: 10px;">
+                    <span class="badge {% if user.role == "ADMIN" %}badge-admin{% elif user.role == "COACH" %}badge-coach{% else %}badge-member{% endif %}">{{ user.role }}</span>
+                </td>
+                <td style="padding: 10px;">
+                    {% if user.is_active %}
+                    <span style="color: #44ff44;">Yes</span>
+                    {% else %}
+                    <span style="color: #ff4444;">No</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 10px;">
+                    <a href="{% url "admin-user-update" user.pk %}" class="btn"
+                        style="padding: 4px 10px; font-size: 0.8rem;">Edit</a>
+                    <a href="{% url "admin-user-delete" user.pk %}" class="btn"
+                        style="background-color: #444; padding: 4px 10px; font-size: 0.8rem;">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

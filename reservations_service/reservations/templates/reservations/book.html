@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Booking - WAMS Gym{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 50px auto; text-align: center;">
+    <h1>Confirm Booking</h1>
+    <p>You are about to reserve a spot for:</p>
+    <h2 style="color: var(--primary);">{{ title }}</h2>
+
+    <p style="color: #888; margin-bottom: 2rem;">
+        Please make sure you can attend. Cancellation is allowed up to 1 hour before the start.
+    </p>
+
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <form method="post" style="width: auto;">
+            {% csrf_token %}
+            <button type="submit" class="btn">Confirm Reservation</button>
+        </form>
+        <a href="/courses" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
+{% endblock %}

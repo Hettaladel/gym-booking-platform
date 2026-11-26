@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Django local data
+db.sqlite3
+*.sqlite3
+media/
+staticfiles/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs and test output
+*.log
+*_logs*.txt
+*_debug*.txt
+transcript*.txt
+.coverage
+htmlcov/
+
+# OS / editor
+.DS_Store
+__MACOSX/
+.idea/
+.vscode/

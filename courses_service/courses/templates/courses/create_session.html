@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}New Session - WAMS Gym{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 0 auto;">
+    <h1>Schedule Training</h1>
+    <form method="post">
+        {% csrf_token %}
+
+        {% if error %}
+        <div style="color: red; padding: 10px;">{{ error }}</div>
+        {% endif %}
+
+        <div>
+            <label for="course">Training Type</label>
+            <select name="course_id" id="course" required>
+                {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.title }}</option>
+                {% empty %}
+                <option disabled>No course types available</option>
+                {% endfor %}
+            </select>
+
+        </div>
+
+        <div>
+            <label for="start">Start Time</label>
+            <input type="datetime-local" name="start_datetime" id="start" required>
+        </div>
+
+        <div>
+            <label for="end">End Time</label>
+            <input type="datetime-local" name="end_datetime" id="end" required>
+        </div>
+
+        <div>
+            <label for="capacity">Capacity (Max Participants)</label>
+            <input type="number" name="capacity" id="capacity" min="1" value="15" required>
+        </div>
+
+        <button type="submit">Publish Session</button>
+        <a href="/" class="btn btn-secondary" style="margin-top: 10px; display: block;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

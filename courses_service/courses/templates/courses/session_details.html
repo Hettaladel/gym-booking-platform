@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Session Details - WAMS Gym{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <a href="/" style="color: var(--primary); text-decoration: none;">← Back to Dashboard</a>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="margin-top: 0; color: var(--primary);">{{ session.course.title }}</h1>
+
+        {% if user.role == 'COACH' and user.id == session.coach_id %}
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'session_edit' session.id %}" class="btn"
+                style="padding: 8px 16px; font-size: 0.9rem;">Edit</a>
+            <a href="{% url 'session_delete' session.id %}" class="btn btn-secondary"
+                style="padding: 8px 16px; font-size: 0.9rem; border-color: #ff4444; color: #ff4444;">Delete</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 1.5rem 0;">
+        <div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Date</div>
+            <div style="font-size: 1.1rem; font-weight: bold;">{{ session.start_datetime|date:"D, M d, Y" }}</div>
+        </div>
+        <div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Time</div>
+            <div style="font-size: 1.1rem; font-weight: bold;">{{ session.start_datetime|time:"H:i" }} - {{
+                session.end_datetime|time:"H:i" }}</div>
+        </div>
+        <div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Capacity</div>
+            <div style="font-size: 1.1rem; font-weight: bold;">{{ session.capacity }} spots</div>
+        </div>
+        <div>
+            <div style="color: var(--text-muted); font-size: 0.9rem;">Reservations</div>
+            <div
+                style="font-size: 1.1rem; font-weight: bold; color: {% if reservation_count > 0 %}#4f4{% else %}#888{% endif %};">
+                {{ reservation_count }} / {{ session.capacity }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-top: 0;">Registered Members</h2>
+
+    {% if reservations %}
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead style="background: rgba(255, 77, 77, 0.1); color: var(--primary);">
+                <tr>
+                    <th style="padding: 1rem; text-align: left;">#</th>
+                    <th style="padding: 1rem; text-align: left;">Username</th>
+                    <th style="padding: 1rem; text-align: left;">Full Name</th>
+                    <th style="padding: 1rem; text-align: left;">Email</th>
+                    <th style="padding: 1rem; text-align: left;">Reserved At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                <tr style="border-bottom: 1px solid #444;">
+                    <td style="padding: 1rem;">{{ forloop.counter }}</td>
+                    <td style="padding: 1rem;">
+                        <strong>{{ reservation.username }}</strong>
+                    </td>
+                    <td style="padding: 1rem;">
+                        {% if reservation.first_name or reservation.last_name %}
+                        {{ reservation.first_name }} {{ reservation.last_name }}
+                        {% else %}
+                        <span style="color: #888;">-</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">{{ reservation.email }}</td>
+                    <td style="padding: 1rem; color: #888;">
+                        {{ reservation.created_at|default:"-" }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; color: #888;">
+        <p style="font-size: 1.1rem;">No members have reserved this session yet.</p>
+        <p style="font-size: 0.9rem;">Check back later!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

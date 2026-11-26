@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses - WAMS Gym{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        padding-top: 1rem;
+    }
+
+    .course-card {
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s, box-shadow 0.3s;
+        background: rgba(30, 30, 30, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(204, 255, 0, 0.15);
+        border-color: var(--primary);
+    }
+
+    .course-image {
+        height: 200px;
+        width: 100%;
+        background-color: #222;
+        background-position: center;
+        background-size: cover;
+        position: relative;
+    }
+
+    .course-image::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 0%, rgba(18, 18, 18, 1));
+    }
+
+    .course-content {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-title {
+        font-size: 1.8rem;
+        text-transform: uppercase;
+        margin: 0 0 0.5rem 0;
+        color: white;
+        letter-spacing: 1px;
+    }
+
+    .course-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .coach-name {
+        font-style: italic;
+        color: var(--accent);
+    }
+
+    .session-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid transparent;
+        transition: background 0.2s;
+    }
+
+    .session-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .session-time {
+        font-weight: bold;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .session-date {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+
+    .book-btn {
+        background: var(--primary);
+        border: 1px solid var(--primary);
+        color: black;
+        padding: 10px 24px;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        text-decoration: none;
+        box-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
+        transition: all 0.3s;
+        display: inline-block;
+        margin-top: 1rem;
+        width: 100%;
+        text-align: center;
+    }
+
+    .book-btn:hover {
+        background: #b3e600;
+        color: black;
+        box-shadow: 0 0 25px rgba(204, 255, 0, 0.8);
+        transform: scale(1.02);
+    }
+
+    .filter-bar {
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid #444;
+        color: var(--text-muted);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: var(--primary);
+        color: black;
+        border-color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+        <h1 style="margin-bottom: 0.5rem; font-size: 3rem;">FIND YOUR <span style="color: var(--primary);">POWER</span></h1>
+        <p style="color: var(--text-muted);">Select a session and start your transformation today.</p>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <div class="filter-btn active">All Classes</div>
+    <div class="filter-btn">Strength</div>
+    <div class="filter-btn">Cardio</div>
+    <div class="filter-btn">Flexibility</div>
+</div>
+
+<div class="dashboard-grid">
+    {% for session_data in sessions %}
+    <div class="course-card card">
+        <div class="course-image" style="background-image: url('{{ session_data.image_url }}');"></div>
+
+        <div class="course-content">
+            <h2 class="course-title">{{ session_data.session.course.title }}</h2>
+            <div class="course-info">
+                <span class="coach-name">Coach: {{ session_data.coach_name|default:"TBA" }}</span>
+                <span class="capacity-badge" style="color: var(--text-muted);">
+                    {{ session_data.available_spots }} Spots Left
+                </span>
+            </div>
+
+            <div class="session-item">
+                <div>
+                    <div class="session-date">{{ session_data.session.start_datetime|date:"M d, Y" }}</div>
+                    <div class="session-time">{{ session_data.session.start_datetime|time:"H:i" }} - {{ session_data.session.end_datetime|time:"H:i" }}</div>
+                </div>
+
+                {% if session_data.is_reserved %}
+                <button class="btn" style="background: #444; color: #888; border: 1px solid #555; cursor: default; box-shadow: none; width: 100%; margin-top: 1rem;">Booked</button>
+                {% elif session_data.available_spots > 0 %}
+                <a href="http://localhost:8003/reservations/book/{{ session_data.session.id }}/" class="book-btn">RESERVE NOW</a>
+                {% else %}
+                <button class="btn" style="background: #444; color: #888; border: 1px solid #555; cursor: default; box-shadow: none; width: 100%; margin-top: 1rem;">Full</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
+        <h2 style="color: var(--text-muted);">No sessions available right now.</h2>
+        <p>Check back later for new schedules!</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

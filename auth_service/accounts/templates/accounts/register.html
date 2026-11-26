@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - WAMS Gym{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 50px auto;">
+    <h1 style="text-align: center; border: none;">Join the WAMS Family</h1>
+    <form method="post" action="/auth/register/">
+        {% csrf_token %}
+
+        {% if error %}
+        <div
+            style="background-color: rgba(255,0,0,0.2); border: 1px solid red; color: white; padding: 10px; border-radius: 4px;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <div>
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" placeholder="Choose a username" required>
+        </div>
+
+        <div>
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" placeholder="your@email.com" required>
+        </div>
+
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Create a strong password" required>
+        </div>
+
+        <div>
+            <label for="role">I am a...</label>
+            <select name="role" id="role">
+                <option value="MEMBER">Member (Join Classes)</option>
+                <option value="COACH">Coach (Create Classes)</option>
+                <option value="ADMIN">Admin (Manage Gym)</option>
+            </select>
+        </div>
+
+        <button type="submit">Create Account</button>
+    </form>
+    <p style="margin-top: 20px; text-align: center; color: #888;">
+        Already a member? <a href="/auth/login" style="color: var(--primary);">Login</a>
+    </p>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}My Reservations - WAMS Gym{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-confirmed {
+        color: #44ff44;
+    }
+
+    .status-cancelled {
+        color: #ff4444;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>My Upcoming Sessions</h1>
+
+{% if reservations %}
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background: rgba(255, 77, 77, 0.1); color: var(--primary);">
+            <tr>
+                <th style="padding: 1rem; text-align: left;">Course</th>
+                <th style="padding: 1rem; text-align: left;">Start Time</th>
+                <th style="padding: 1rem; text-align: left;">Status</th>
+                <th style="padding: 1rem; text-align: left;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in reservations %}
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;"><strong>{{ item.title }}</strong></td>
+                <td style="padding: 1rem;">{{ item.start|default:"-" }}</td>
+                <td style="padding: 1rem;">
+                    <span
+                        class="{% if item.object.status == 'CONFIRMED' %}status-confirmed{% else %}status-cancelled{% endif %}">
+                        {{ item.object.status }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    {% if item.object.status == 'CONFIRMED' %}
+                    <a href="/reservations/cancel/{{ item.object.id }}/" class="btn btn-secondary"
+                        style="padding: 5px 10px; font-size: 0.8rem; border-color: #f44; color: #f44;">Cancel</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card" style="text-align: center;">
+    <p>You have no upcoming reservations.</p>
+    <a href="/courses" class="btn">Find a Class</a>
+</div>
+{% endif %}
+
+<script>
+    // Check if success parameter is present
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === '1') {
+        // Show success popup
+        alert('✅ Done! Your reservation has been saved successfully.');
+
+        // Remove success parameter from URL to prevent showing popup on refresh
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+</script>
+{% endblock %}
